@@ -61,6 +61,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// LatchKey specific colors
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
+				confidence: {
+					high: 'hsl(var(--confidence-high))',
+					medium: 'hsl(var(--confidence-medium))',
+					low: 'hsl(var(--confidence-low))'
 				}
 			},
 			borderRadius: {
@@ -84,11 +94,30 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'terminal-glow': {
+					'0%': {
+						boxShadow: '0 0 5px hsl(var(--primary) / 0.3)'
+					},
+					'50%': {
+						boxShadow: '0 0 20px hsl(var(--primary) / 0.6)'
+					},
+					'100%': {
+						boxShadow: '0 0 5px hsl(var(--primary) / 0.3)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'terminal-glow': 'terminal-glow 2s ease-in-out infinite'
+			},
+			boxShadow: {
+				'terminal': '0 0 20px hsl(var(--primary) / 0.3)',
+				'terminal-hover': '0 0 30px hsl(var(--primary) / 0.5)',
+				'confidence-high': '0 0 15px hsl(var(--confidence-high) / 0.3)',
+				'confidence-medium': '0 0 15px hsl(var(--confidence-medium) / 0.3)',
+				'confidence-low': '0 0 15px hsl(var(--confidence-low) / 0.3)'
 			}
 		}
 	},
