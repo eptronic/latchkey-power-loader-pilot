@@ -36,14 +36,12 @@ export function Header({
       <div className="container flex h-16 items-center justify-between px-6">
         {/* Left side - Logo and Title */}
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">LK</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">LatchKey AI</h1>
-              <p className="text-xs text-muted-foreground">Editorial Dashboard</p>
-            </div>
+          <div className="flex items-center">
+            <img 
+              src="https://latchkey.ai/lovable-uploads/6ecc74f9-647b-4000-a25d-d462bb4f1be6.png" 
+              alt="LatchKey AI Editorial Dashboard Logo" 
+              className="h-10 w-auto"
+            />
           </div>
 
           {/* Batch Info */}
