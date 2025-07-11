@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Upload, Wifi, WifiOff } from "lucide-react";
+import { RefreshCw, Upload, Wifi, WifiOff, Grid2X2, List } from "lucide-react";
 import { BatchData } from "@/types/article";
 
 interface HeaderProps {
@@ -9,6 +9,8 @@ interface HeaderProps {
     crewAI: 'online' | 'offline' | 'processing';
     newsletterAssembly: 'ready' | 'busy' | 'error';
   };
+  currentView: 'grid' | 'focus';
+  onViewToggle: (view: 'grid' | 'focus') => void;
   onRefreshFromCrewAI: () => void;
   onSyncToNewsletter: () => void;
 }
@@ -16,6 +18,8 @@ interface HeaderProps {
 export function Header({ 
   currentBatch, 
   agentStatus, 
+  currentView,
+  onViewToggle,
   onRefreshFromCrewAI, 
   onSyncToNewsletter 
 }: HeaderProps) {
@@ -58,8 +62,30 @@ export function Header({
           )}
         </div>
 
-        {/* Right side - Agent Controls and Status */}
-        <div className="flex items-center gap-3">
+        {/* Right side - View Toggle, Agent Controls and Status */}
+        <div className="flex items-center gap-4">
+          {/* View Toggle */}
+          <div className="flex items-center bg-muted rounded-lg p-1">
+            <Button
+              onClick={() => onViewToggle('grid')}
+              variant={currentView === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              className="gap-2 h-8"
+            >
+              <Grid2X2 className="h-4 w-4" />
+              Grid View
+            </Button>
+            <Button
+              onClick={() => onViewToggle('focus')}
+              variant={currentView === 'focus' ? 'default' : 'ghost'}
+              size="sm"
+              className="gap-2 h-8"
+            >
+              <List className="h-4 w-4" />
+              Focus View
+            </Button>
+          </div>
+          
           {/* Agent Sync Controls */}
           <Button 
             variant="terminal" 

@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { ArticleCard } from "./ArticleCard";
+import { ArticleList } from "./ArticleList";
 import { useToast } from "@/hooks/use-toast";
 import { Article, BatchData, FilterState, AppState } from "@/types/article";
 import { mockBatch } from "@/data/mockBatch";
@@ -25,6 +26,9 @@ export function Dashboard() {
     latchkeyVoiceAnalysisEnabled: true,
     previewPanelOpen: false
   });
+
+  const [currentView, setCurrentView] = useState<'grid' | 'focus'>('focus');
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
 
   // Filter articles based on current filter settings
   const filteredArticles = useMemo(() => {
@@ -250,11 +254,36 @@ export function Dashboard() {
     });
   };
 
+  const handleViewToggle = (view: 'grid' | 'focus') => {
+    setCurrentView(view);
+    if (view === 'focus' && sortedArticles.length > 0 && !selectedArticleId) {
+      setSelectedArticleId(sortedArticles[0].id);
+    }
+  };
+
+  const handleArticleSelect = (articleId: string) => {
+    setSelectedArticleId(articleId);
+  };
+
+  // Get selected article for focus view
+  const selectedArticle = selectedArticleId 
+    ? sortedArticles.find(a => a.id === selectedArticleId) 
+    : null;
+
+  // Auto-select first article when switching to focus view or when articles change
+  useEffect(() => {
+    if (currentView === 'focus' && sortedArticles.length > 0 && !selectedArticleId) {
+      setSelectedArticleId(sortedArticles[0].id);
+    }
+  }, [currentView, sortedArticles, selectedArticleId]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header 
         currentBatch={appState.currentBatch}
         agentStatus={appState.agentStatus}
+        currentView={currentView}
+        onViewToggle={handleViewToggle}
         onRefreshFromCrewAI={handleRefreshFromCrewAI}
         onSyncToNewsletter={handleSyncToNewsletter}
       />
@@ -272,7 +301,7 @@ export function Dashboard() {
           onArchiveBatch={handleArchiveBatch}
         />
         
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-hidden">
           {sortedArticles.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -282,18 +311,64 @@ export function Dashboard() {
                 </p>
               </div>
             </div>
+          ) : currentView === 'grid' ? (
+            <div className="h-full overflow-auto p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {sortedArticles.map(article => (
+                  <ArticleCard
+                    key={article.id}
+                    article={article}
+                    povQualityEnabled={appState.povQualityEnabled}
+                    latchkeyVoiceAnalysisEnabled={appState.latchkeyVoiceAnalysisEnabled}
+                    onStatusChange={handleStatusChange}
+                    onPOVEdit={handlePOVEdit}
+                  />
+                ))}
+              </div>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {sortedArticles.map(article => (
-                <ArticleCard
-                  key={article.id}
-                  article={article}
-                  povQualityEnabled={appState.povQualityEnabled}
-                  latchkeyVoiceAnalysisEnabled={appState.latchkeyVoiceAnalysisEnabled}
-                  onStatusChange={handleStatusChange}
-                  onPOVEdit={handlePOVEdit}
-                />
-              ))}
+            /* Focus View - Split Pane */
+            <div className="flex h-full">
+              {/* Left Pane - Article List (30%) */}
+              <div className="w-[30%] border-r border-border bg-muted/20 flex flex-col">
+                <div className="p-4 border-b border-border">
+                  <h3 className="font-semibold text-lg">Articles</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {sortedArticles.length} articles • Click to review
+                  </p>
+                </div>
+                <div className="flex-1 overflow-auto p-4">
+                  <ArticleList
+                    articles={sortedArticles}
+                    selectedArticleId={selectedArticleId}
+                    onArticleSelect={handleArticleSelect}
+                  />
+                </div>
+              </div>
+              
+              {/* Right Pane - Selected Article Detail (70%) */}
+              <div className="flex-1 overflow-auto p-6">
+                {selectedArticle ? (
+                  <ArticleCard
+                    article={selectedArticle}
+                    povQualityEnabled={appState.povQualityEnabled}
+                    latchkeyVoiceAnalysisEnabled={appState.latchkeyVoiceAnalysisEnabled}
+                    onStatusChange={handleStatusChange}
+                    onPOVEdit={handlePOVEdit}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <h3 className="text-xl font-semibold mb-2 text-muted-foreground">
+                        Select an Article
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Choose an article from the list to begin editorial review
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </main>
